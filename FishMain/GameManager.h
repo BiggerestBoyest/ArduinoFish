@@ -3,22 +3,20 @@
 #include "Arduino.h"
 #include "Player.h"
 #include "Fish.h"
-#include "Dictionary.h"
+#include <List.hpp>
 
  class GameManager{
   public:
     GameManager();
-    
-    List<> players;
-    map <int,Fish>* FishCollection;
-
+    List<Player> players;
     void EndGame();
     void StartGame();
     Fish GetFish();
     Fish GenerateFish(); // maybe generate random fish values sometimes idk with our predefined fish
     Fish GetRandomFish();
     bool HasGameEnded();
-     WaitForSensors();
+    void WaitForSensors();
+    bool GameStarted = false;
 
 
 
