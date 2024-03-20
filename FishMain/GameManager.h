@@ -16,7 +16,12 @@
     Fish GetRandomFish();
     bool HasGameEnded();
     void WaitForSensors();
+    void WaitForFish(); // not sure what the method should be called, but essentially holds all the logic for when the line is in and the player is waiting for a fish 
+    void CheckIfCaughtFish(); // also should have a different name but for now its fine
+    bool hasFishOnLine = false;
     bool GameStarted = false;
+    int currentCatchChance; // 
+    int currentLineTime;
 
 
 

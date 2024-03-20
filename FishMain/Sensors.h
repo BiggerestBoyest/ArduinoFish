@@ -14,6 +14,7 @@
     uint8_t GetVibrationMotorPin();
     uint8_t GetLightSensorPin();
     uint8_t GetFourDigitDisplayPin();
+    bool GetCurrentSensorState(unsigned char sensitivity);
     //void UpdateTimer(unsigned char *second, unsigned char *minute);
 
     rgb_lcd lcd;
@@ -26,7 +27,7 @@
     uint8_t fourDigitDisplay = 2;
     uint8_t pin3 = 0;
     uint8_t vibrationMotorPin = 4;
-    uint8_t lightSensorPin = 5;
+    uint8_t lightSensorPin = 1;
    // void SetupFourDigitDisplay();
 
 

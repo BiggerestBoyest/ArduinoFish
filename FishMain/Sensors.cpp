@@ -40,6 +40,27 @@ uint8_t Sensors::GetFourDigitDisplayPin(){
     return fourDigitDisplay;
 }
 
+void Sensors::UpdateVibrationMotor(bool isOn){
+    if(isOn)
+      digitalWrite(vibrationMotorPin, HIGH);
+    else
+      digitalWrite(vibrationMotorPin, LOW);
+}
+
+
+bool Sensors::GetCurrentSensorState(unsigned char sensitivity){
+
+  int value = analogRead(lightSensorPin);
+
+  if (value < sensitivity){
+    return true;
+  }
+
+  return false;
+
+}
+
+
 
 // void Sensors::SetupFourDigitDisplay(){
 //       tm1637.set(BRIGHT_TYPICAL);

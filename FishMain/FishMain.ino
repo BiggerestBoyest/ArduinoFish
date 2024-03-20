@@ -42,7 +42,7 @@ void setup(){
   //STEP TWO: Setup players
   //currently only one player
   manager.players.add(firstPlayer);
-
+  Serial.print("test");
 
   //Step 3 Start the game
   manager.StartGame();
@@ -53,6 +53,12 @@ void setup(){
 void loop() { 
 
     while(!manager.GameStarted){} // doesn't start the game until the manager is ready
+    delay(1); // frame buffer
+    if(sensors.GetCurrentSensorState(50)){
+      manager.WaitForFish();
+    } else {
+       manager.CheckIfCaughtFish();
+    }
     
     if(CanUpdateTimer){
 
@@ -68,7 +74,8 @@ void loop() {
           tm1637.display(TimeDisplay);
           delay(500);
           tm1637.clearDisplay();
-           delay(500);
+          delay(500);
+          manager.EndGame();
     }
 }
 
@@ -78,10 +85,10 @@ void UpdateTimer(){
     second = internalSecond < 0 ? 0 : internalSecond;
 
     if (FLAG_MINUTE == true && FLAG_MINUTE_BLINK_AMOUNT > 0){
-        TimeDisplay[2] = 0x00;
-        TimeDisplay[3] = 0x00;
-        TimeDisplay[0] = 0x6;
-        TimeDisplay[1] = 0x00;
+      TimeDisplay[2] = 0x00;
+      TimeDisplay[3] = 0x00;
+      TimeDisplay[0] = 0x6;
+      TimeDisplay[1] = 0x00;
       delay(200);
       tm1637.clearDisplay();
       delay(200);
@@ -109,11 +116,6 @@ void SetupFourDigitDisplay(){
 void TimingISR(){
     if(minute == 0 && second == 0 && microSecond == 0){
       CanUpdateTimer = false;
-          // TimeDisplay[2] = 0x49;   
-          // TimeDisplay[3] = 0x6E;
-          // TimeDisplay[0] = 0x99;
-          // TimeDisplay[1] = 0x46;
-          // tm1637.display(TimeDisplay);
           return;
         }
 
