@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Fish.h"
 #include <List.hpp>
+#include "Sensors.h"
 
  class GameManager{
   public:
@@ -22,12 +23,15 @@
     bool GameStarted = false;
     int currentCatchChance; // 
     int currentLineTime;
+    float catchPenalty; // penalty to the catch chance if a player ignores a real bite
+    Sensors *sensors;
 
 
 
 private:
   float playerCount;
-
+  void FalseBiteVibration();
+  void BiteVibration();
 
 
 };

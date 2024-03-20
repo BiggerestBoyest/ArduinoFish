@@ -13,7 +13,6 @@
 #define DIO 3
 TM1637 tm1637(CLK, DIO);
 
-Fish fish;
 GameManager manager;
 Sensors sensors;
 
@@ -42,6 +41,7 @@ void setup(){
   //STEP TWO: Setup players
   //currently only one player
   manager.players.add(firstPlayer);
+  manager.sensors = &sensors;
   Serial.print("test");
 
   //Step 3 Start the game
