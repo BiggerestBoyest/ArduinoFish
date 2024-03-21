@@ -54,10 +54,11 @@ void loop() {
 
     while(!manager.GameStarted){} // doesn't start the game until the manager is ready
     delay(1); // frame buffer
-    if(sensors.GetCurrentSensorState(50)){
+    if(sensors.GetCurrentSensorState(75)){
       manager.WaitForFish();
     } else {
        manager.CheckIfCaughtFish();
+       delay(100); // cooldown for checking fish (this is a bit of a hack since sometimes the light sensor will read outside the range for one frame so the 100 milisecond delay prevents those readings from occuring)
     }
     
     if(CanUpdateTimer){

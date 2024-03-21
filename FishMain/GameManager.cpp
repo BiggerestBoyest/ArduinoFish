@@ -1,6 +1,9 @@
 #include "HardwareSerial.h"
 #include "GameManager.h"
 #include "Arduino.h"
+#include "VibrationPatternManager.h"
+
+VibrationPatternManager vbManager;
 Fish testFish = Fish("testFish",10,1500,30);
 
 bool FLAG_HASPUTINLINE;
@@ -27,7 +30,6 @@ void GameManager::EndGame(){
 }
 
 void GameManager::WaitForFish(){
-
   if (hasFishOnLine || FLAG_HASFALSEBITE)
     return;
 
@@ -39,9 +41,8 @@ void GameManager::WaitForFish(){
 
   microsecond++;
   if(microsecond == 1000)
-  {
+  { 
     currentLineTime++;
-    microsecond = 0;
 
     float rand = random(0,100);
 
@@ -60,50 +61,62 @@ void GameManager::WaitForFish(){
       if (currentLineTime % 15 == 0){
         currentCatchChance+= 10;
       }
+
+          microsecond = 0;
   }
 }
 void GameManager::FalseBiteVibration(){
-  delay(100);
-  sensors->UpdateVibrationMotor(true);
-    delay(100);
-  sensors->UpdateVibrationMotor(false);
-    delay(100);
-  sensors->UpdateVibrationMotor(true);
-    delay(100);
-  sensors->UpdateVibrationMotor(false);
-    delay(100);
-  sensors->UpdateVibrationMotor(true);
-    delay(100);
-  sensors->UpdateVibrationMotor(false);
+
+  int delays[] = {750,750,100};
+  vbManager.SLRunBasicVibration(sensors, delays,sizeof(delays) / sizeof(delays[0]), 1000);
+  // delay(100);
+  // sensors->UpdateVibrationMotor(true);
+  //   delay(100);
+  // sensors->UpdateVibrationMotor(false);
+  //   delay(100);
+  // sensors->UpdateVibrationMotor(true);
+  //   delay(100);
+  // sensors->UpdateVibrationMotor(false);
+  //   delay(100);
+  // sensors->UpdateVibrationMotor(true);
+  //   delay(100);
+  // sensors->UpdateVibrationMotor(false);
   FLAG_HASFALSEBITE = false;
 }
 
 void GameManager::BiteVibration(){
   sensors->UpdateVibrationMotor(true);
-    delay(CurrentFish->GetBiteStrength());
+  int elapsedTime = 0;
+  while(elapsedTime < CurrentFish->GetBiteStrength()){
+    delay(1);//frame buffer not sure why needed but it works
+    elapsedTime++;
+
+    if(!sensors->GetCurrentSensorState(25)){ // checks if the user has pulled out the rod in time
+      sensors->UpdateVibrationMotor(false); 
+      return;
+    }
+  }
       sensors->UpdateVibrationMotor(false);
-      currentCatchChance = currentCatchChance - catchPenalty < 5 ? 5 : currentCatchChance - catchPenalty;\
-      if(FLAG_HASPUTINLINE) // just in case 
-        hasFishOnLine = false;
+      currentCatchChance = currentCatchChance - catchPenalty < 5 ? 5 : currentCatchChance - catchPenalty;// if the player missed the 
+      hasFishOnLine = false;
 
 }
 
 void GameManager::CheckIfCaughtFish(){
   if(FLAG_HASPUTINLINE){
-    
   FLAG_HASPUTINLINE = false;
+  FLAG_HASFALSEBITE = false;
 
   if(hasFishOnLine){
     Serial.println("caught fish");
+    currentCatchChance = 5;
+
   } else {
     Serial.println("did not catch fish");
   }
-
-  FLAG_HASPUTINLINE = false;
-  FLAG_HASFALSEBITE = false;
   hasFishOnLine = false;
   } else if (FLAG_HASFALSEBITE){
-        Serial.println("did not catch fish");
+        Serial.println("did not catch fish false bite");
         hasFishOnLine = false;
         FLAG_HASPUTINLINE = false;
         FLAG_HASFALSEBITE = false;
