@@ -3,6 +3,9 @@
 #include <TimerOne.h>
 #include <avr/pgmspace.h>
 #include "TM1637.h"
+#include <Wire.h>
+#include "rgb_lcd.h"
+
 
 
 //Pins for 4 digit display
@@ -26,6 +29,14 @@ void Sensors::SetupSensors(){
   //Set up LCD
   lcd.begin(16,2);
 
+}
+
+void Sensors::UpdateLCDScreen(String name, int points){
+  lcd.setCursor(0,0);
+  lcd.print(name);
+  lcd.setCursor(0,1);
+    lcd.print("Points: ");
+  lcd.print(points);
 }
 
 uint8_t Sensors::GetVibrationMotorPin(){

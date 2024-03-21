@@ -15,8 +15,8 @@
     uint8_t GetLightSensorPin();
     uint8_t GetFourDigitDisplayPin();
     bool GetCurrentSensorState(unsigned char sensitivity);
+    void UpdateLCDScreen(String playerName, int points);
     //void UpdateTimer(unsigned char *second, unsigned char *minute);
-
     rgb_lcd lcd;
 
     Sensors();

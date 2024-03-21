@@ -5,9 +5,12 @@
  class Player{
   public:
     Player();
+    String playerName;
+    void AddPoints(int points);
+    void SetPlayerName(String newName);
 
-private:
-     float currentPoints;
+    int currentPoints = 0;
+
 };
 
 #endif

@@ -10,12 +10,13 @@
   public:
     GameManager();
     List<Player> players;
+    Player currentPlayer;
     void EndGame();
     void StartGame();
     Fish GetFish();
     Fish GenerateFish(); // maybe generate random fish values sometimes idk with our predefined fish
     Fish GetRandomFish();
-    bool HasGameEnded();
+    bool HasGameEnded = false;
     void WaitForSensors();
     void WaitForFish(); // not sure what the method should be called, but essentially holds all the logic for when the line is in and the player is waiting for a fish 
     void CheckIfCaughtFish(); // also should have a different name but for now its fine

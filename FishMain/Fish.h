@@ -9,9 +9,9 @@
     float GetFalseBitPercentage(int currentCatchChance);
      String fishName;
      float GetBiteStrength() {return biteStrength;}
+     int points;
 
 private:
-     int points;
      int biteStrength;
      float falseBitePercentage; // false bite percentage is based on the current catch percentage (for example, falseBitePercentage(30 / 100) * (100 - currentCatchChance))
      float GetFishValue() {return points;}

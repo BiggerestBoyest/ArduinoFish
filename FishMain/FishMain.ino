@@ -7,7 +7,7 @@
 #include <TimerOne.h>
 #include <avr/pgmspace.h>
 #include "TM1637.h"
-
+//PINS FOR THINGIES, D2 = 4 DIGIT DISPLAY, D4 = VIBRATION MOTOR, 12C = RGB LCD, A1 = LIGHT SENSOR
 
 #define CLK 2
 #define DIO 3
@@ -40,8 +40,11 @@ void setup(){
 
   //STEP TWO: Setup players
   //currently only one player
+  firstPlayer.SetPlayerName("Jim");
   manager.players.add(firstPlayer);
+  manager.currentPlayer = firstPlayer;
   manager.sensors = &sensors;
+  manager.sensors->UpdateLCDScreen(firstPlayer.playerName,firstPlayer.currentPoints);
   Serial.print("test");
 
   //Step 3 Start the game
@@ -53,6 +56,8 @@ void setup(){
 void loop() { 
 
     while(!manager.GameStarted){} // doesn't start the game until the manager is ready
+    if(manager.HasGameEnded) return; // if the game has ended. do not do the game logic loop
+    
     delay(1); // frame buffer
     if(sensors.GetCurrentSensorState(75)){
       manager.WaitForFish();
