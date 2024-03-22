@@ -6,6 +6,8 @@
 
 VibrationPatternManager vbManager;
 Fish testFish = Fish("testFish",10,1500,30);
+Fish coolFish = Fish("Gay Fish",100,500,50);
+
 
 bool FLAG_HASPUTINLINE;
 bool FLAG_HASFALSEBITE = false;

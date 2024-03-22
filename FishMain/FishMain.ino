@@ -78,9 +78,9 @@ void loop() {
           TimeDisplay[0] = 0x99;
           TimeDisplay[1] = 0x46;
           tm1637.display(TimeDisplay);
-          delay(500);
+          delay(100);
           tm1637.clearDisplay();
-          delay(500);
+          delay(100);
           manager.EndGame();
     }
 }
