@@ -6,6 +6,7 @@
 #include <List.hpp>
 #include "Sensors.h"
 #include "Updatable.h"
+#include <elapsedMillis.h>
 
 class GameManager : public Updatable
 {
@@ -13,10 +14,10 @@ class GameManager : public Updatable
     GameManager();
     List<Player> players;
     Player currentPlayer;
-    void Update() const override;
-    void Init() const override;
-    void Control() const override;
-
+    void Update()  override;
+    void Init()  override;
+    void Control()  override;
+    unsigned long CurrentTime;
     void EndGame();
     void StartGame();
     Fish GetFish();
@@ -38,7 +39,8 @@ class GameManager : public Updatable
   private:
     float playerCount;
     void FalseBiteVibration();
-    void BiteVibration();
+    void BiteVibration(unsigned long timeDelay);
+    void UpdateVibration();
 };
 
 #endif

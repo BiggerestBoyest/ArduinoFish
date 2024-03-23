@@ -36,7 +36,6 @@ void VibrationPatternManager::SLRunBasicVibration(Sensors *sensor, int delays[],
       int timeDelay = 0;
       while(timeDelay < timeBetweenVibrate)
       {
-        delay(1);
         if (!sensor->GetCurrentSensorState(25)) 
           break;
 

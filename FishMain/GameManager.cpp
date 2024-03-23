@@ -3,12 +3,16 @@
 #include "Arduino.h"
 #include "VibrationPatternManager.h"
 #include "Helper.h"
+#include <elapsedMillis.h>
 
 VibrationPatternManager vbManager;
-Fish testFish = Fish("testFish",10,1500,30);
+Fish testFish = Fish("testFish",10,50,30);
 
 bool FLAG_HASPUTINLINE;
 bool FLAG_HASFALSEBITE = false;
+bool FLAG_BITEVIBRATION = false;
+
+unsigned long biteVibrationTime;
 
 int microsecond = 0;
 Fish *CurrentFish;
@@ -25,6 +29,7 @@ int delaySix[] = {200,200,300};
 int delaySeven[] = {100,400};
 int delayEight[] = {300,100};
 
+elapsedMillis test;
 GameManager::GameManager(){}
 
 void GameManager::StartGame(){
@@ -36,17 +41,20 @@ void GameManager::StartGame(){
   Serial.print("game init");
 
 }
-void GameManager::Update() const
+void GameManager::Update() 
 {
-
+    CheckIfCaughtFish();
+    WaitForFish();
+    UpdateVibration();
+    BiteVibration(CurrentFish->GetBiteStrength());
 }
 
-void GameManager::Control() const
+void GameManager::Control() 
 {
   
 }
 
-void GameManager::Init() const
+void GameManager::Init() 
 {
   Serial.print("testsssss");
 }
@@ -55,7 +63,13 @@ void GameManager::EndGame(){
   HasGameEnded = true;
 }
 
+void GameManager::UpdateVibration(){
+
+}
+
 void GameManager::WaitForFish(){
+
+  if(!sensors->GetCurrentSensorState(100)) return;
   if (hasFishOnLine || FLAG_HASFALSEBITE)
     return;
 
@@ -66,7 +80,7 @@ void GameManager::WaitForFish(){
   FLAG_HASPUTINLINE = true;
 
   microsecond++;  
-  if(microsecond == 50)
+  if(microsecond == 20 && !hasFishOnLine)
   { 
     currentLineTime++;
 
@@ -74,12 +88,13 @@ void GameManager::WaitForFish(){
     if (rand < currentCatchChance){
       hasFishOnLine = true;
       Serial.println("hasFish");
-      BiteVibration();
+      FLAG_BITEVIBRATION = true;
+      //BiteVibration(CurrentFish->GetBiteStrength());
       //FISH IS CURRENTLY ON THE LINE
     } else if (rand > currentCatchChance && rand < CurrentFish->GetFalseBitPercentage(currentCatchChance)) {
       Serial.println("FALSE BITE");
-      FLAG_HASFALSEBITE = true;
-      FalseBiteVibration();
+    //  FLAG_HASFALSEBITE = true;
+      //FalseBiteVibration();
       //CALCULATE IF A FALSE BITE IS DONE, WILL NEED TO HAVE A COOLDOWN WHEN FALSE BITES CAN OCCUR (SUCH AS NO FALSE BITES FOR THE FIRST 10-20 SECONDS AND YOU MIGHT NOT BE ABLE TO GET LIKE 4-5 FALSE BITES IN A ROW)
     }
     //IF AN ACTUAL BITE OCCUR CHECK IF THE USER HAS CAUGHT IT.
@@ -129,26 +144,44 @@ void GameManager::FalseBiteVibration(){
   FLAG_HASFALSEBITE = false;
 }
 
-void GameManager::BiteVibration(){
-  sensors->UpdateVibrationMotor(true);
-  int elapsedTime = 0;
-  while(elapsedTime < CurrentFish->GetBiteStrength()){
-    delay(1);//frame buffer not sure why needed but it works
-    elapsedTime++;
+void GameManager::BiteVibration(unsigned long timeDelay){
 
-    if(!sensors->GetCurrentSensorState(25)){ // checks if the user has pulled out the rod in time
+  if (!FLAG_BITEVIBRATION) return;
+  biteVibrationTime++;
+  Serial.print(biteVibrationTime);
+  if (biteVibrationTime < timeDelay)
+     sensors->UpdateVibrationMotor(true);
+  else
+  {
+    sensors->UpdateVibrationMotor(false);
+    currentCatchChance = currentCatchChance - catchPenalty < 5 ? 5 : currentCatchChance - catchPenalty;// if the player missed the 
+    hasFishOnLine = false;
+    FLAG_BITEVIBRATION = false;
+    biteVibrationTime = 0;
+  }
+
+   if(!sensors->GetCurrentSensorState(100)){ // checks if the user has pulled out the rod in time
       sensors->UpdateVibrationMotor(false); 
+      biteVibrationTime = 0;
+      FLAG_BITEVIBRATION = false;
       return;
     }
-  }
-      sensors->UpdateVibrationMotor(false);
-      currentCatchChance = currentCatchChance - catchPenalty < 5 ? 5 : currentCatchChance - catchPenalty;// if the player missed the 
-      hasFishOnLine = false;
+  
+  // while(elapsedTime < CurrentFish->GetBiteStrength()){
+
+  //   if(!sensors->GetCurrentSensorState(25)){ // checks if the user has pulled out the rod in time
+  //     sensors->UpdateVibrationMotor(false); 
+  //     return;
+  //   }
+  // }
+      // sensors->UpdateVibrationMotor(false);
+      // currentCatchChance = currentCatchChance - catchPenalty < 5 ? 5 : currentCatchChance - catchPenalty;// if the player missed the 
+      // hasFishOnLine = false;
 
 }
 
 void GameManager::CheckIfCaughtFish(){
-  if(FLAG_HASPUTINLINE){
+  if(FLAG_HASPUTINLINE && !sensors->GetCurrentSensorState(100)){
   FLAG_HASPUTINLINE = false;
   FLAG_HASFALSEBITE = false;
 
@@ -163,12 +196,13 @@ void GameManager::CheckIfCaughtFish(){
   }
       currentCatchChance = 10;
   hasFishOnLine = false;
-  } else if (FLAG_HASFALSEBITE){
-        Serial.println("did not catch fish false bite");
-        hasFishOnLine = false;
-        FLAG_HASPUTINLINE = false;
-        FLAG_HASFALSEBITE = false;
-      currentCatchChance = 10;
   }
+  // } else if (FLAG_HASFALSEBITE){
+  //       Serial.println("did not catch fish false bite");
+  //       hasFishOnLine = false;
+  //       FLAG_HASPUTINLINE = false;
+  //       FLAG_HASFALSEBITE = false;
+  //     currentCatchChance = 10;
+  //}
 }
 

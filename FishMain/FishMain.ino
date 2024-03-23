@@ -11,7 +11,7 @@
 //PINS FOR THINGIES, D2 = 4 DIGIT DISPLAY, D4 = VIBRATION MOTOR, 12C = RGB LCD, A1 = LIGHT SENSOR
 
 #define FRAME_TIME 33
-#define TIME_THRESHOLD 1
+#define TIME_THRESHOLD 10
 #define CLK 2
 #define DIO 3
 TM1637 tm1637(CLK, DIO);
@@ -21,6 +21,7 @@ Sensors sensors;
 
 unsigned long currentFrameTime;
 elapsedMillis frameTimer;
+unsigned long currentTime;
 
 //4Digit Display Variables
 int microSecond = 100;
@@ -70,25 +71,35 @@ void loop() {
     if ((currentFrameTime = frameTimer) >= FRAME_TIME)
     {
       frameTimer = 0;
+      currentTime++;
+      manager->CurrentTime = currentTime;
 
       if(manager->HasGameEnded) return; // if the game has ended. do not do the game logic loop
 
-
       // HIGH_PRIO_UPDATES
 
-      if(sensors.GetCurrentSensorState(100))
-      {
-        manager->WaitForFish();
-      } else 
-      {
-        manager->CheckIfCaughtFish();
-      }
+      // if(sensors.GetCurrentSensorState(100))
+      // {
+      //   manager->WaitForFish();
+      // } else 
+      // {
+      //   manager->CheckIfCaughtFish();
+      // }
+
+      manager->Update();
+
+
 
 
       // LOW_PRIO_UPDATES
-
-      if ((currentFrameTime - FRAME_TIME) > TIME_THRESHOLD) //TIMER OVERRUN checks if the frame timer is one second behind, if so it might break the game
-        Serial.print("Warning: Timing error has occured");
+      unsigned long savedFrameTime = currentFrameTime;
+      if ((currentFrameTime - FRAME_TIME) > TIME_THRESHOLD) //TIMER OVERRUN checks if the frame timer is one second behind, if so it might break the game{
+      {
+        Serial.print("Warning: Timing error has occured. Saved frame time ");
+        Serial.print(savedFrameTime);
+        Serial.print(" frame time threshold: ");
+        Serial.print(frameTimer);
+      }
       
     }
 
