@@ -7,14 +7,20 @@
 #include <TimerOne.h>
 #include <avr/pgmspace.h>
 #include "TM1637.h"
+#include <elapsedMillis.h>
 //PINS FOR THINGIES, D2 = 4 DIGIT DISPLAY, D4 = VIBRATION MOTOR, 12C = RGB LCD, A1 = LIGHT SENSOR
 
+#define FRAME_TIME 33
+#define TIME_THRESHOLD 1
 #define CLK 2
 #define DIO 3
 TM1637 tm1637(CLK, DIO);
 
-GameManager manager;
+GameManager* manager;
 Sensors sensors;
+
+unsigned long currentFrameTime;
+elapsedMillis frameTimer;
 
 //4Digit Display Variables
 int microSecond = 100;
@@ -25,6 +31,8 @@ int8_t TimeDisplay[] = {0x00, 0x00, 0x00, 0x00};
 bool FLAG_MINUTE = false;
 int FLAG_MINUTE_BLINK_AMOUNT = 8;
 
+int timerDelay = 100;
+
 bool CanUpdateTimer = true;
 
 Player firstPlayer;
@@ -33,56 +41,73 @@ Player firstPlayer;
 void setup(){
   Serial.begin(9600);
 
+  manager = new GameManager();
+
   //STEP ONE: CHECK IF SENSORS ARE READY
   sensors.SetupSensors();
+    Serial.print("game true");
+
   SetupFourDigitDisplay();
-  Timer1.attachInterrupt(TimingISR);
+   Timer1.attachInterrupt(TimingISR);
+  // //STEP TWO: Setup players
+  // //currently only one player
 
-  //STEP TWO: Setup players
-  //currently only one player
   firstPlayer.SetPlayerName("Jim");
-  manager.players.add(firstPlayer);
-  manager.currentPlayer = firstPlayer;
-  manager.sensors = &sensors;
-  manager.sensors->UpdateLCDScreen(firstPlayer.playerName,firstPlayer.currentPoints);
-  Serial.print("test");
-
-  //Step 3 Start the game
-  manager.StartGame();
+   manager->players.add(firstPlayer);
+   manager->currentPlayer = firstPlayer;
+   manager->sensors = &sensors;
+   manager->sensors->UpdateLCDScreen(firstPlayer.playerName,firstPlayer.currentPoints);
+  // //Step 3 Start the game
+    manager->StartGame();
 
 
 }
 
 void loop() { 
 
-    while(!manager.GameStarted){} // doesn't start the game until the manager is ready
-    if(manager.HasGameEnded) return; // if the game has ended. do not do the game logic loop
-    
-    delay(1); // frame buffer
-    if(sensors.GetCurrentSensorState(75)){
-      manager.WaitForFish();
-    } else {
-       manager.CheckIfCaughtFish();
-       delay(100); // cooldown for checking fish (this is a bit of a hack since sometimes the light sensor will read outside the range for one frame so the 100 milisecond delay prevents those readings from occuring)
-    }
-    
-    if(CanUpdateTimer){
+    while(!manager->GameStarted){} // doesn't start the game until the manager is ready
 
-        UpdateTimer();
-        tm1637.display(TimeDisplay);
-    } else if (minute == 0 && second == 0 && microSecond == 0){
-          tm1637.point(POINT_OFF);    
+    if ((currentFrameTime = frameTimer) >= FRAME_TIME)
+    {
+      frameTimer = 0;
 
-          TimeDisplay[2] = 0x49;   
-          TimeDisplay[3] = 0x6E;
-          TimeDisplay[0] = 0x99;
-          TimeDisplay[1] = 0x46;
-          tm1637.display(TimeDisplay);
-          delay(500);
-          tm1637.clearDisplay();
-          delay(500);
-          manager.EndGame();
+      if(manager->HasGameEnded) return; // if the game has ended. do not do the game logic loop
+
+
+      // HIGH_PRIO_UPDATES
+
+      if(sensors.GetCurrentSensorState(100))
+      {
+        manager->WaitForFish();
+      } else 
+      {
+        manager->CheckIfCaughtFish();
+      }
+
+
+      // LOW_PRIO_UPDATES
+
+      if ((currentFrameTime - FRAME_TIME) > TIME_THRESHOLD) //TIMER OVERRUN checks if the frame timer is one second behind, if so it might break the game
+        Serial.print("Warning: Timing error has occured");
+      
     }
+
+      //UPDATE_WITH_INTERNAL_TIMER
+
+      // if(CanUpdateTimer)
+      // {
+      //   UpdateTimer();
+      //   tm1637.display(TimeDisplay);
+      // } else if (minute == 0 && second == 0 && microSecond == 0)
+      // {
+      //   tm1637.point(POINT_OFF);    
+      //   TimeDisplay[2] = 0x49;   
+      //   TimeDisplay[3] = 0x6E;
+      //   TimeDisplay[0] = 0x99;
+      //   TimeDisplay[1] = 0x46;
+      //   tm1637.display(TimeDisplay);
+      //   manager->EndGame();
+      // }
 }
 
 void UpdateTimer(){
@@ -113,6 +138,8 @@ void UpdateTimer(){
 
 
 void SetupFourDigitDisplay(){
+        Serial.println("setting up timer");
+
       tm1637.set(BRIGHT_TYPICAL);
       tm1637.init();
       Timer1.initialize(10000);//timing for 10ms

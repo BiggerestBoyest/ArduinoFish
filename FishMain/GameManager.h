@@ -5,12 +5,18 @@
 #include "Fish.h"
 #include <List.hpp>
 #include "Sensors.h"
+#include "Updatable.h"
 
- class GameManager{
+class GameManager : public Updatable
+{
   public:
     GameManager();
     List<Player> players;
     Player currentPlayer;
+    void Update() const override;
+    void Init() const override;
+    void Control() const override;
+
     void EndGame();
     void StartGame();
     Fish GetFish();
@@ -29,12 +35,10 @@
 
 
 
-private:
-  float playerCount;
-  void FalseBiteVibration();
-  void BiteVibration();
-
-
+  private:
+    float playerCount;
+    void FalseBiteVibration();
+    void BiteVibration();
 };
 
 #endif

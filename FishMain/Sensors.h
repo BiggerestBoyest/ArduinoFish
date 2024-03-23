@@ -27,7 +27,7 @@
     uint8_t fourDigitDisplay = 2;
     uint8_t pin3 = 0;
     uint8_t vibrationMotorPin = 4;
-    uint8_t lightSensorPin = 1;
+    uint8_t lightSensorPin = 3;
    // void SetupFourDigitDisplay();
 
 

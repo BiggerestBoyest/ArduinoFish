@@ -28,7 +28,6 @@ int delayEight[] = {300,100};
 GameManager::GameManager(){}
 
 void GameManager::StartGame(){
-  delay(1000);
   //Might have some intro things occur here but for now it will simply allow for the sensors to work
   GameStarted = true;
   currentCatchChance = 10;
@@ -36,6 +35,20 @@ void GameManager::StartGame(){
   helper.ReseedRandom();
   Serial.print("game init");
 
+}
+void GameManager::Update() const
+{
+
+}
+
+void GameManager::Control() const
+{
+  
+}
+
+void GameManager::Init() const
+{
+  Serial.print("testsssss");
 }
 
 void GameManager::EndGame(){
@@ -52,13 +65,12 @@ void GameManager::WaitForFish(){
 
   FLAG_HASPUTINLINE = true;
 
-  microsecond++;
-  if(microsecond == 900)
+  microsecond++;  
+  if(microsecond == 50)
   { 
     currentLineTime++;
 
     float rand = random(0,100);
-
     if (rand < currentCatchChance){
       hasFishOnLine = true;
       Serial.println("hasFish");

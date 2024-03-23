@@ -19,6 +19,8 @@ Sensors::Sensors(){}
 
 void Sensors::SetupSensors(){
 
+  Serial.println("setting up sensors");
+
   //Set up light sensor
   pinMode(lightSensorPin,OUTPUT);
   //Set up vibration sensor
@@ -28,6 +30,7 @@ void Sensors::SetupSensors(){
   //SetupFourDigitDisplay();
   //Set up LCD
   lcd.begin(16,2);
+  Serial.println("setting up sensors");
 
 }
 
