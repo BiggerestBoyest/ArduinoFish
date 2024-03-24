@@ -61,6 +61,18 @@ void Sensors::UpdateVibrationMotor(bool isOn){
       digitalWrite(vibrationMotorPin, LOW);
 }
 
+void Sensors::Update() 
+{
+  IsLineIn = GetCurrentSensorState(75);
+}
+
+void Sensors::Init(){
+
+}
+
+void Sensors::Control(){
+  
+}
 
 bool Sensors::GetCurrentSensorState(unsigned char sensitivity){
 

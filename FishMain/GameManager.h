@@ -41,6 +41,8 @@ class GameManager : public Updatable
     void FalseBiteVibration();
     void BiteVibration(unsigned long timeDelay);
     void UpdateVibration();
+    void SLVibration(unsigned int delays[], size_t arraySize, unsigned int timeBetweenDelay);
+    void UpdateFalseBiteSeed();
 };
 
 #endif

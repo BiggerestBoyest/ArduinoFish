@@ -25,16 +25,18 @@ unsigned long currentTime;
 
 //4Digit Display Variables
 int microSecond = 100;
-int internalSecond = 5; // unsigned char cant go below zero, bit of a fix to get around it
-unsigned char second = 5; // the number displayed on the 4 digit display
-unsigned char minute = 2;
+int internalSecond = 20; // unsigned char cant go below zero, bit of a fix to get around it
+unsigned char second = 20; // the number displayed on the 4 digit display
+unsigned char minute = 1;
 int8_t TimeDisplay[] = {0x00, 0x00, 0x00, 0x00}; 
 bool FLAG_MINUTE = false;
 int FLAG_MINUTE_BLINK_AMOUNT = 8;
-
+unsigned long elapsedTime;
 int timerDelay = 100;
 
 bool CanUpdateTimer = true;
+bool FLAG_DISPLAYONCE = false;
+bool FLAG_CLEARDISPLAYONCE = false;
 
 Player firstPlayer;
 //Player secondPlayer;
@@ -77,19 +79,10 @@ void loop() {
       if(manager->HasGameEnded) return; // if the game has ended. do not do the game logic loop
 
       // HIGH_PRIO_UPDATES
-
-      // if(sensors.GetCurrentSensorState(100))
-      // {
-      //   manager->WaitForFish();
-      // } else 
-      // {
-      //   manager->CheckIfCaughtFish();
-      // }
-
+      sensors.Update();
       manager->Update();
-
-
-
+      BlinkTimerUpdate();
+      
 
       // LOW_PRIO_UPDATES
       unsigned long savedFrameTime = currentFrameTime;
@@ -105,40 +98,68 @@ void loop() {
 
       //UPDATE_WITH_INTERNAL_TIMER
 
-      // if(CanUpdateTimer)
-      // {
-      //   UpdateTimer();
-      //   tm1637.display(TimeDisplay);
-      // } else if (minute == 0 && second == 0 && microSecond == 0)
-      // {
-      //   tm1637.point(POINT_OFF);    
-      //   TimeDisplay[2] = 0x49;   
-      //   TimeDisplay[3] = 0x6E;
-      //   TimeDisplay[0] = 0x99;
-      //   TimeDisplay[1] = 0x46;
-      //   tm1637.display(TimeDisplay);
-      //   manager->EndGame();
-      // }
+      if(CanUpdateTimer)
+      {
+        UpdateTimer();
+        tm1637.display(TimeDisplay);
+      } else if (minute == 0 && second == 0 && microSecond == 0)
+      {
+        tm1637.point(POINT_OFF);    
+        TimeDisplay[2] = 0x49;   
+        TimeDisplay[3] = 0x6E;
+        TimeDisplay[0] = 0x99;
+        TimeDisplay[1] = 0x46;
+        tm1637.display(TimeDisplay);
+        manager->EndGame();
+      }
+}
+
+void BlinkTimerUpdate()
+{
+     if (FLAG_MINUTE == true && FLAG_MINUTE_BLINK_AMOUNT > 0)
+    {
+      elapsedTime++;
+      if(elapsedTime < 5)
+      {
+          if(!FLAG_DISPLAYONCE)
+          {
+            TimeDisplay[2] = 0x00;
+            TimeDisplay[3] = 0x00;
+            TimeDisplay[0] = 0x6;
+            TimeDisplay[1] = 0x00;
+          }
+      } else if (elapsedTime >= 5 && elapsedTime < 10)
+      {
+        if(!FLAG_CLEARDISPLAYONCE)
+        {
+            TimeDisplay[2] = 0x7f;
+            TimeDisplay[3] = 0x7f;
+            TimeDisplay[0] = 0x7f;
+            TimeDisplay[1] = 0x7f;
+          FLAG_CLEARDISPLAYONCE = true;
+        }
+      } else 
+      {
+        elapsedTime = 0;
+        CanUpdateTimer = false;
+        FLAG_MINUTE_BLINK_AMOUNT--;
+        FLAG_DISPLAYONCE = false;
+        FLAG_CLEARDISPLAYONCE = false;
+
+      }
+    }    
+
 }
 
 void UpdateTimer(){
+     if (FLAG_MINUTE == true && FLAG_MINUTE_BLINK_AMOUNT > 0)
+        return;
 
     tm1637.point(POINT_ON);    //POINT_ON = 1,POINT_OFF = 0;
     second = internalSecond < 0 ? 0 : internalSecond;
 
-    if (FLAG_MINUTE == true && FLAG_MINUTE_BLINK_AMOUNT > 0){
-      TimeDisplay[2] = 0x00;
-      TimeDisplay[3] = 0x00;
-      TimeDisplay[0] = 0x6;
-      TimeDisplay[1] = 0x00;
-      delay(200);
-      tm1637.clearDisplay();
-      delay(200);
-      CanUpdateTimer = false;
-      FLAG_MINUTE_BLINK_AMOUNT--;
-      return;
+   
 
-    }    
     //displays the time, if its less than a minute left, switch to show the microseconds
     TimeDisplay[2] = minute == 0 ? microSecond / 10 : second / 10 ;
     TimeDisplay[3] = minute == 0 ? microSecond % 10 : second % 10 ;

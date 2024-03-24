@@ -4,17 +4,23 @@
 #include "rgb_lcd.h"
 #include <Wire.h>
 #include <TimerOne.h>
+#include "Updatable.h"
 
- class Sensors{
+ class Sensors : public Updatable
+ {
   public:
     void SetupSensors();
     int GetLighSensorValue();
     void WriteToLCD();
+    void Update() override;
+    void Init() override;
+    void Control() override;
     void UpdateVibrationMotor(bool isOn);
     uint8_t GetVibrationMotorPin();
     uint8_t GetLightSensorPin();
     uint8_t GetFourDigitDisplayPin();
     bool GetCurrentSensorState(unsigned char sensitivity);
+    bool IsLineIn;
     void UpdateLCDScreen(String playerName, int points);
     //void UpdateTimer(unsigned char *second, unsigned char *minute);
     rgb_lcd lcd;
