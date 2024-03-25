@@ -1,5 +1,5 @@
 /*
-  rgb_lcd.cpp
+  old_rgb_lcd.cpp
   2013 Copyright (c) Seeed Technology Inc.  All right reserved.
 
   Author:Loovee
@@ -32,37 +32,35 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <Wire.h>
 
-//#include <Wire.h>
-#include <SoftwareI2C.h>
-
-#include "rgb_lcd.h"
+#include "old_rgb_lcd.h"
 
 void i2c_send_byte(unsigned char dta)
 {
-    Wire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
-    Wire->write(dta);                            // sends five bytes
-    Wire->endTransmission();                     // stop transmitting
+    Wire.beginTransmission(LCD_ADDRESS);        // transmit to device #4
+    Wire.write(dta);                            // sends five bytes
+    Wire.endTransmission();                     // stop transmitting
 }
 
 void i2c_send_byteS(unsigned char *dta, unsigned char len)
 {
-    Wire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
+    Wire.beginTransmission(LCD_ADDRESS);        // transmit to device #4
     for(int i=0; i<len; i++)
     {
-        Wire->write(dta[i]);
+        Wire.write(dta[i]);
     }
-    Wire->endTransmission();                     // stop transmitting
+    Wire.endTransmission();                     // stop transmitting
 }
 
-rgb_lcd::rgb_lcd()
+old_rgb_lcd::old_rgb_lcd()
 {
 }
 
-void rgb_lcd::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) 
+void old_rgb_lcd::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) 
 {
 
-    Wire->begin();
+    Wire.begin();
     
     if (lines > 1) {
         _displayfunction |= LCD_2LINE;
@@ -125,19 +123,19 @@ void rgb_lcd::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
 }
 
 /********** high level commands, for the user! */
-void rgb_lcd::clear()
+void old_rgb_lcd::clear()
 {
     command(LCD_CLEARDISPLAY);        // clear display, set cursor position to zero
     delayMicroseconds(2000);          // this command takes a long time!
 }
 
-void rgb_lcd::home()
+void old_rgb_lcd::home()
 {
     command(LCD_RETURNHOME);        // set cursor position to zero
     delayMicroseconds(2000);        // this command takes a long time!
 }
 
-void rgb_lcd::setCursor(uint8_t col, uint8_t row)
+void old_rgb_lcd::setCursor(uint8_t col, uint8_t row)
 {
 
     col = (row == 0 ? col|0x80 : col|0xc0);
@@ -148,74 +146,74 @@ void rgb_lcd::setCursor(uint8_t col, uint8_t row)
 }
 
 // Turn the display on/off (quickly)
-void rgb_lcd::noDisplay()
+void old_rgb_lcd::noDisplay()
 {
     _displaycontrol &= ~LCD_DISPLAYON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
-void rgb_lcd::display() {
+void old_rgb_lcd::display() {
     _displaycontrol |= LCD_DISPLAYON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turns the underline cursor on/off
-void rgb_lcd::noCursor()
+void old_rgb_lcd::noCursor()
 {
     _displaycontrol &= ~LCD_CURSORON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
-void rgb_lcd::cursor() {
+void old_rgb_lcd::cursor() {
     _displaycontrol |= LCD_CURSORON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // Turn on and off the blinking cursor
-void rgb_lcd::noBlink()
+void old_rgb_lcd::noBlink()
 {
     _displaycontrol &= ~LCD_BLINKON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
-void rgb_lcd::blink()
+void old_rgb_lcd::blink()
 {
     _displaycontrol |= LCD_BLINKON;
     command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 // These commands scroll the display without changing the RAM
-void rgb_lcd::scrollDisplayLeft(void)
+void old_rgb_lcd::scrollDisplayLeft(void)
 {
     command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
 }
-void rgb_lcd::scrollDisplayRight(void)
+void old_rgb_lcd::scrollDisplayRight(void)
 {
     command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
 }
 
 // This is for text that flows Left to Right
-void rgb_lcd::leftToRight(void)
+void old_rgb_lcd::leftToRight(void)
 {
     _displaymode |= LCD_ENTRYLEFT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This is for text that flows Right to Left
-void rgb_lcd::rightToLeft(void)
+void old_rgb_lcd::rightToLeft(void)
 {
     _displaymode &= ~LCD_ENTRYLEFT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'right justify' text from the cursor
-void rgb_lcd::autoscroll(void)
+void old_rgb_lcd::autoscroll(void)
 {
     _displaymode |= LCD_ENTRYSHIFTINCREMENT;
     command(LCD_ENTRYMODESET | _displaymode);
 }
 
 // This will 'left justify' text from the cursor
-void rgb_lcd::noAutoscroll(void)
+void old_rgb_lcd::noAutoscroll(void)
 {
     _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
     command(LCD_ENTRYMODESET | _displaymode);
@@ -223,7 +221,7 @@ void rgb_lcd::noAutoscroll(void)
 
 // Allows us to fill the first 8 CGRAM locations
 // with custom characters
-void rgb_lcd::createChar(uint8_t location, uint8_t charmap[])
+void old_rgb_lcd::createChar(uint8_t location, uint8_t charmap[])
 {
 
     location &= 0x7; // we only have 8 locations 0-7
@@ -240,7 +238,7 @@ void rgb_lcd::createChar(uint8_t location, uint8_t charmap[])
 }
 
 // Control the backlight LED blinking
-void rgb_lcd::blinkLED(void)
+void old_rgb_lcd::blinkLED(void)
 {
     // blink period in seconds = (<reg 7> + 1) / 24
     // on/off ratio = <reg 6> / 256
@@ -248,7 +246,7 @@ void rgb_lcd::blinkLED(void)
     setReg(0x06, 0x7f);  // half on, half off
 }
 
-void rgb_lcd::noBlinkLED(void)
+void old_rgb_lcd::noBlinkLED(void)
 {
     setReg(0x07, 0x00);
     setReg(0x06, 0xff);
@@ -257,14 +255,14 @@ void rgb_lcd::noBlinkLED(void)
 /*********** mid level commands, for sending data/cmds */
 
 // send command
-inline void rgb_lcd::command(uint8_t value)
+inline void old_rgb_lcd::command(uint8_t value)
 {
     unsigned char dta[2] = {0x80, value};
     i2c_send_byteS(dta, 2);
 }
 
 // send data
-inline size_t rgb_lcd::write(uint8_t value)
+inline size_t old_rgb_lcd::write(uint8_t value)
 {
 
     unsigned char dta[2] = {0x40, value};
@@ -272,15 +270,15 @@ inline size_t rgb_lcd::write(uint8_t value)
     return 1; // assume sucess
 }
 
-void rgb_lcd::setReg(unsigned char addr, unsigned char dta)
+void old_rgb_lcd::setReg(unsigned char addr, unsigned char dta)
 {
-    Wire->beginTransmission(RGB_ADDRESS); // transmit to device #4
-    Wire->write(addr);
-    Wire->write(dta);
-    Wire->endTransmission();    // stop transmitting
+    Wire.beginTransmission(RGB_ADDRESS); // transmit to device #4
+    Wire.write(addr);
+    Wire.write(dta);
+    Wire.endTransmission();    // stop transmitting
 }
 
-void rgb_lcd::setRGB(unsigned char r, unsigned char g, unsigned char b)
+void old_rgb_lcd::setRGB(unsigned char r, unsigned char g, unsigned char b)
 {
     setReg(REG_RED, r);
     setReg(REG_GREEN, g);
@@ -295,14 +293,8 @@ const unsigned char color_define[4][3] =
     {0, 0, 255},                // blue
 };
 
-void rgb_lcd::setColor(unsigned char color)
+void old_rgb_lcd::setColor(unsigned char color)
 {
     if(color > 3)return ;
     setRGB(color_define[color][0], color_define[color][1], color_define[color][2]);
-}
-
-void rgb_lcd::initSoftwareI2C(SoftwareI2C *w, int __sda, int __scl)
-{
-    Wire = w;
-    Wire->begin(__sda, __scl);
 }

@@ -2,13 +2,15 @@
 #define Sensors_h
 #include "Arduino.h"
 #include "rgb_lcd.h"
-#include <Wire.h>
+#include <SoftwareI2C.h>
 #include <TimerOne.h>
 #include "Updatable.h"
+#include "old_rgb_lcd.h"
 
  class Sensors : public Updatable
  {
   public:
+    
     void SetupSensors();
     int GetLighSensorValue();
     void WriteToLCD();
@@ -24,6 +26,7 @@
     void UpdateLCDScreen(String playerName, int points);
     //void UpdateTimer(unsigned char *second, unsigned char *minute);
     rgb_lcd lcd;
+    old_rgb_lcd lcd2;
 
     Sensors();
 

@@ -5,6 +5,8 @@
 #include "TM1637.h"
 #include <Wire.h>
 #include "rgb_lcd.h"
+#include "SoftwareI2C.h"
+ #include "old_rgb_lcd.h"
 
 
 
@@ -13,7 +15,8 @@
 #define DIO 3
 // TM1637 tm1637(CLK, DIO);
 // int8_t TimeDisplay[] = {0x00, 0x00, 0x00, 0x00};
-
+SoftwareI2C rgb_lcd_1;
+SoftwareI2C rgb_lcd_2;
 
 Sensors::Sensors(){}
 
@@ -29,17 +32,27 @@ void Sensors::SetupSensors(){
   pinMode(fourDigitDisplay,OUTPUT);
   //SetupFourDigitDisplay();
   //Set up LCD
-  lcd.begin(16,2);
-  Serial.println("setting up sensors");
+  lcd.initSoftwareI2C(&rgb_lcd_1,3,2);
+  lcd.begin(16, 2);
+  lcd.print("jimbo");
+  // lcd2.initSoftwareI2C(&rgb_lcd_2,4,3);
+  lcd2.begin(16, 2);
+  lcd2.print("jimmy");
+
+//  lcd.begin(16, 2, LCD_5x8DOTS);
 
 }
-
 void Sensors::UpdateLCDScreen(String name, int points){
-  lcd.setCursor(0,0);
-  lcd.print(name);
-  lcd.setCursor(0,1);
-    lcd.print("Points: ");
-  lcd.print(points);
+  lcd.print("test");
+
+    lcd2.print("test2");
+
+  // lcd.setCursor(0,0);
+  // lcd.print(name);
+  // lcd.setCursor(0,1);
+  //   lcd.print("Points: ");
+  // lcd.print(points);
+  // lcd2.print("test");
 }
 
 uint8_t Sensors::GetVibrationMotorPin(){

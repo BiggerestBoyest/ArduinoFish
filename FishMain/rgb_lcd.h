@@ -142,7 +142,8 @@ public:
 private:
   void send(uint8_t, uint8_t);
   void setReg(unsigned char addr, unsigned char dta);
-
+  void i2c_send_byte(unsigned char dta);
+  void i2c_send_byteS(unsigned char *dta, unsigned char len);
   uint8_t _displayfunction;
   uint8_t _displaycontrol;
   uint8_t _displaymode;
@@ -150,8 +151,8 @@ private:
   uint8_t _initialized;
 
   uint8_t _numlines,_currline;
+  SoftwareI2C* RGBWire;
 
-  SoftwareI2C* Wire;
 
 };
 

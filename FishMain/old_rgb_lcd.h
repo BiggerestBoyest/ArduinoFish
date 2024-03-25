@@ -1,5 +1,5 @@
 /*
-  rgb_lcd.h
+  old_rgb_lcd.h
   2013 Copyright (c) Seeed Technology Inc.  All right reserved.
 
   Author:Loovee
@@ -29,13 +29,11 @@
 */
 
 
-#ifndef __RGB_LCD_H__
-#define __RGB_LCD_H__
+#ifndef __OLD_RGB_LCD_H__
+#define __OLD_RGB_LCD_H__
 
 #include <inttypes.h>
 #include "Print.h"
-#include <SoftwareI2C.h>
-
 
 // Device I2C Arress
 #define LCD_ADDRESS     (0x7c>>1)
@@ -94,11 +92,11 @@
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-class rgb_lcd : public Print 
+class old_rgb_lcd : public Print 
 {
 
 public:
-  rgb_lcd();
+  old_rgb_lcd();
 
   void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
 
@@ -135,7 +133,6 @@ public:
   // blink the LED backlight
   void blinkLED(void);
   void noBlinkLED(void);
-  void initSoftwareI2C(SoftwareI2C* w, int __sda, int __scl);
   
   using Print::write;
   
@@ -150,9 +147,6 @@ private:
   uint8_t _initialized;
 
   uint8_t _numlines,_currline;
-
-  SoftwareI2C* Wire;
-
 };
 
 #endif

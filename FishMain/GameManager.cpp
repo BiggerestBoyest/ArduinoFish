@@ -8,7 +8,7 @@
 VibrationPatternManager vbManager;
 Fish testFish = Fish("testFish",10,20,30);
 
-bool FLAG_HASPUTINLINE;
+bool FLAG_HASPUTINLINE = false;
 bool FLAG_HASFALSEBITE = false;
 bool FLAG_BITEVIBRATION = false;
 bool FLAG_TIMEBETWEENFALSEBITE = false;

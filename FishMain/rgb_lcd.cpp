@@ -33,26 +33,26 @@
 #include <string.h>
 #include <inttypes.h>
 
-//#include <Wire.h>
 #include <SoftwareI2C.h>
 
 #include "rgb_lcd.h"
 
-void i2c_send_byte(unsigned char dta)
+void rgb_lcd::i2c_send_byte(unsigned char dta)
 {
-    Wire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
-    Wire->write(dta);                            // sends five bytes
-    Wire->endTransmission();                     // stop transmitting
+  
+    RGBWire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
+    RGBWire->write(dta);                            // sends five bytes
+    RGBWire->endTransmission();                     // stop transmitting
 }
 
-void i2c_send_byteS(unsigned char *dta, unsigned char len)
+void rgb_lcd::i2c_send_byteS(unsigned char *dta, unsigned char len)
 {
-    Wire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
+    RGBWire->beginTransmission(LCD_ADDRESS);        // transmit to device #4
     for(int i=0; i<len; i++)
     {
-        Wire->write(dta[i]);
+        RGBWire->write(dta[i]);
     }
-    Wire->endTransmission();                     // stop transmitting
+    RGBWire->endTransmission();                     // stop transmitting
 }
 
 rgb_lcd::rgb_lcd()
@@ -62,7 +62,7 @@ rgb_lcd::rgb_lcd()
 void rgb_lcd::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) 
 {
 
-    Wire->begin();
+    //Wire->begin();
     
     if (lines > 1) {
         _displayfunction |= LCD_2LINE;
@@ -274,10 +274,10 @@ inline size_t rgb_lcd::write(uint8_t value)
 
 void rgb_lcd::setReg(unsigned char addr, unsigned char dta)
 {
-    Wire->beginTransmission(RGB_ADDRESS); // transmit to device #4
-    Wire->write(addr);
-    Wire->write(dta);
-    Wire->endTransmission();    // stop transmitting
+    RGBWire->beginTransmission(RGB_ADDRESS); // transmit to device #4
+    RGBWire->write(addr);
+    RGBWire->write(dta);
+    RGBWire->endTransmission();    // stop transmitting
 }
 
 void rgb_lcd::setRGB(unsigned char r, unsigned char g, unsigned char b)
@@ -303,6 +303,6 @@ void rgb_lcd::setColor(unsigned char color)
 
 void rgb_lcd::initSoftwareI2C(SoftwareI2C *w, int __sda, int __scl)
 {
-    Wire = w;
-    Wire->begin(__sda, __scl);
+    RGBWire = w;
+    RGBWire->begin(__sda, __scl);
 }
