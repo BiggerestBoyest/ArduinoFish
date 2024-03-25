@@ -27,7 +27,7 @@ unsigned long currentTime;
 int microSecond = 100;
 int internalSecond = 20; // unsigned char cant go below zero, bit of a fix to get around it
 unsigned char second = 20; // the number displayed on the 4 digit display
-unsigned char minute = 1;
+unsigned char minute = 2;
 int8_t TimeDisplay[] = {0x00, 0x00, 0x00, 0x00}; 
 bool FLAG_MINUTE = false;
 int FLAG_MINUTE_BLINK_AMOUNT = 8;

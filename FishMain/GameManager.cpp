@@ -30,7 +30,7 @@ Helper helper;
 unsigned int delayOne[] = {5};
 unsigned int delayTwo[] = {5,5,5};
 unsigned int delayThree[] = {8};
-unsigned int delayFour[] = {10};
+unsigned int delayFour[] = {1,1};
 unsigned int delayFive[] = {5,5};
 unsigned int delaySix[] = {7,7,8};
 unsigned int delaySeven[] = {5,5};
