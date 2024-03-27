@@ -10,6 +10,7 @@
      String fishName;
      unsigned long GetBiteStrength() {return biteStrength;}
      int points;
+     byte[8] FishImage;
 
 private:
      unsigned long biteStrength;

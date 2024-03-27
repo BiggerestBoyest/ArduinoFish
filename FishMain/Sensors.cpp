@@ -10,6 +10,38 @@
 
 
 
+byte fish1[8] = {
+    0b00000,
+    0b00000,
+    0b00111,
+    0b01000,
+    0b10000,
+    0b10100,
+    0b10000,
+    0b01000
+};
+byte fish2[8] = {
+      0b00000,
+    0b00000,
+    0b11000,
+    0b00110,
+    0b00001,
+    0b00001,
+    0b00001,
+    0b00010
+};
+byte fish3[8] = {
+      0b00000,
+    0b00110,
+    0b01000,
+    0b01010,
+    0b10100,
+    0b00010,
+    0b11000,
+    0b00110
+};
+
+
 //Pins for 4 digit display
 #define CLK 2
 #define DIO 3
@@ -33,8 +65,13 @@ void Sensors::SetupSensors(){
   //SetupFourDigitDisplay();
   //Set up LCD
   lcd.initSoftwareI2C(&rgb_lcd_1,3,2);
-  lcd.begin(16, 2);
-  lcd.print("jimbo");
+    lcd.createChar(0, fish1);
+  lcd.createChar(1, fish2);
+  lcd.createChar(2, fish3);
+  lcd.setCursor(0, 0);
+  lcd.write((unsigned char)0);
+  lcd.write(1);
+  lcd.write(2);
   // lcd2.initSoftwareI2C(&rgb_lcd_2,4,3);
   lcd2.begin(16, 2);
   lcd2.print("jimmy");
@@ -43,10 +80,6 @@ void Sensors::SetupSensors(){
 
 }
 void Sensors::UpdateLCDScreen(String name, int points){
-  lcd.print("test");
-
-    lcd2.print("test2");
-
   // lcd.setCursor(0,0);
   // lcd.print(name);
   // lcd.setCursor(0,1);
@@ -87,8 +120,8 @@ void Sensors::Control(){
   
 }
 
-bool Sensors::GetCurrentSensorState(unsigned char sensitivity){
-
+bool Sensors::GetCurrentSensorState(unsigned char sensitivity)
+{
   int value = analogRead(lightSensorPin);
 
   if (value < sensitivity){
@@ -98,42 +131,3 @@ bool Sensors::GetCurrentSensorState(unsigned char sensitivity){
   return false;
 
 }
-
-
-
-// void Sensors::SetupFourDigitDisplay(){
-//       tm1637.set(BRIGHT_TYPICAL);
-//       tm1637.init();
-//       Timer1.initialize(10000);//timing for 10ms
-
-// }
-
-// void Sensors::UpdateTimer(unsigned char second, unsigned char minute){
-
-//     tm1637.point(POINT_ON);    //POINT_ON = 1,POINT_OFF = 0;
-
-//     TimeDisplay[2] = second / 10 ;
-//     TimeDisplay[3] = second % 10;
-//     TimeDisplay[0] = minute;
-//     TimeDisplay[1] = 5;
-
-//     tm1637.display(TimeDisplay);
-
-// }
-
-// void TimingISR(){
-//     second++;
-//     CanUpdateTimer = true;
-
-//     if (second >= 100){
-//       second++;
-//         if (second >= 60){
-//           minute++;
-//           second = 0;
-//         }
-      
-//       second = 0;
-//     }
-// }
-
-

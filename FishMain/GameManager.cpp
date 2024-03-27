@@ -39,7 +39,8 @@ unsigned int delayEight[] = {6,8};
 elapsedMillis test;
 GameManager::GameManager(){}
 
-void GameManager::StartGame(){
+void GameManager::StartGame()
+{
   //Might have some intro things occur here but for now it will simply allow for the sensors to work
   GameStarted = true;
   currentCatchChance = 10;
@@ -68,15 +69,18 @@ void GameManager::Init()
   Serial.print("testsssss");
 }
 
-void GameManager::EndGame(){
+void GameManager::EndGame()
+{
   HasGameEnded = true;
 }
 
-void GameManager::UpdateVibration(){
+void GameManager::UpdateVibration()
+{
 
 }
 
-void GameManager::WaitForFish(){
+void GameManager::WaitForFish()
+{
 
   if(!sensors->IsLineIn) return;
 
@@ -95,12 +99,14 @@ void GameManager::WaitForFish(){
     currentLineTime++;
 
     float rand = random(0,100);
-    if (rand < currentCatchChance){
+    if (rand < currentCatchChance)
+    {
       hasFishOnLine = true;
       Serial.println("hasFish");
       FLAG_BITEVIBRATION = true;
       //FISH IS CURRENTLY ON THE LINE
-    } else if (rand > currentCatchChance && rand < CurrentFish->GetFalseBitPercentage(currentCatchChance)) {
+    } else if (rand > currentCatchChance && rand < CurrentFish->GetFalseBitPercentage(currentCatchChance)) 
+    {
       Serial.println("FALSE BITE");
       FLAG_HASFALSEBITE = true;
       //CALCULATE IF A FALSE BITE IS DONE, WILL NEED TO HAVE A COOLDOWN WHEN FALSE BITES CAN OCCUR (SUCH AS NO FALSE BITES FOR THE FIRST 10-20 SECONDS AND YOU MIGHT NOT BE ABLE TO GET LIKE 4-5 FALSE BITES IN A ROW)
@@ -224,7 +230,8 @@ void GameManager::BiteVibration(unsigned long timeDelay){
     biteVibrationTime = 0;
   }
 
-   if(!sensors->IsLineIn){ // checks if the user has pulled out the rod in time
+   if(!sensors->IsLineIn)
+   { // checks if the user has pulled out the rod in time
       sensors->UpdateVibrationMotor(false); 
       biteVibrationTime = 0;
       FLAG_BITEVIBRATION = false;
@@ -233,25 +240,36 @@ void GameManager::BiteVibration(unsigned long timeDelay){
 }
 
 void GameManager::CheckIfCaughtFish(){
-  if(FLAG_HASPUTINLINE && !sensors->IsLineIn){
- biteVibrationTime = 0;
-falseBiteVibrationTime = 0;
- falseBiteIncrementor = 0;
- falseBiteCooldown = 0;
-  FLAG_HASPUTINLINE = false;
-  FLAG_HASFALSEBITE = false;
-   FLAG_BITEVIBRATION = false;
-  FLAG_TIMEBETWEENFALSEBITE = false;
+
+  //Step One: Determine if the fish was pulled out
+  if(FLAG_HASPUTINLINE && !sensors->IsLineIn)
+  {
+    //Step Two: reset all the values 
+    biteVibrationTime = 0;
+    falseBiteVibrationTime = 0;
+    falseBiteIncrementor = 0;
+    falseBiteCooldown = 0;
+    FLAG_HASPUTINLINE = false;
+    FLAG_HASFALSEBITE = false;
+    FLAG_BITEVIBRATION = false;
+    FLAG_TIMEBETWEENFALSEBITE = false;
     sensors->UpdateVibrationMotor(false);
-  if(hasFishOnLine){
-    Serial.println("caught fish");
-    currentPlayer.currentPoints += CurrentFish->points;
-        Serial.println(currentPlayer.currentPoints);
-       currentPlayer.SetPlayerName("Josh");
-    sensors->UpdateLCDScreen(currentPlayer.playerName,currentPlayer.currentPoints);
-  } else {
-    Serial.println("did not catch fish");
-  }
+
+    //Step Three: Determine if a fish was on the line when the rod was pulled out
+    if(hasFishOnLine)
+    {
+      //Step Four: Add the points to the current player and update the LCD screen (Do any updates here when a fish is catch)
+      Serial.println("caught fish");
+      currentPlayer.currentPoints += CurrentFish->points;
+      Serial.println(currentPlayer.currentPoints);
+      currentPlayer.SetPlayerName("Josh");
+      sensors->UpdateLCDScreen(currentPlayer.playerName,currentPlayer.currentPoints);
+    } else 
+    {
+      Serial.println("did not catch fish"); 
+    }
+
+      //Step Five: Reset the catch chance and remove the fish off the line.
       currentCatchChance = 10;
       hasFishOnLine = false;
   }
