@@ -4,9 +4,10 @@
 #include "VibrationPatternManager.h"
 #include "Helper.h"
 #include <elapsedMillis.h>
+#include "Fish.h"
 
 VibrationPatternManager vbManager;
-Fish testFish = Fish("testFish",10,20,30);
+Fish testFish = Fish("Shark",50,50,40, Fish::Shark);
 
 bool FLAG_HASPUTINLINE = false;
 bool FLAG_HASFALSEBITE = false;
@@ -72,6 +73,7 @@ void GameManager::Init()
 void GameManager::EndGame()
 {
   HasGameEnded = true;
+  sensors->UpdateVibrationMotor(false);
 }
 
 void GameManager::UpdateVibration()
@@ -87,8 +89,10 @@ void GameManager::WaitForFish()
   if (hasFishOnLine || FLAG_HASFALSEBITE)
     return;
 
-    if (!FLAG_HASPUTINLINE){ // first time the line is in, generate a fish
+    if (!FLAG_HASPUTINLINE)
+    { // first time the line is in, generate a fish
       CurrentFish = &testFish; // always set current fish to test fish, however a system should be able to check what fish it should be
+      sensors->UpdateFishLCDScreen(CurrentFish);
     }
 
   FLAG_HASPUTINLINE = true;

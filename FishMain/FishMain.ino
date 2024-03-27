@@ -12,8 +12,8 @@
 
 #define FRAME_TIME 33
 #define TIME_THRESHOLD 10
-#define CLK 2
-#define DIO 3
+#define CLK 7
+#define DIO 8
 TM1637 tm1637(CLK, DIO);
 
 GameManager* manager;
